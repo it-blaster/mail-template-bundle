@@ -1,0 +1,6 @@
+*.*~
+.idea
+.nginxrules
+Model/map/*
+Model/om/*
+composer.lock

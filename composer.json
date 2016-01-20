@@ -1,0 +1,23 @@
+{
+  "name": "it-blaster/mail-template-bundle",
+  "description": "Symfony2 mailer bundle",
+  "type": "symfony-bundle",
+  "keywords": ["propel", "mail", "mailer"],
+  "homepage": "https://github.com/it-blaster/mail-template-bundle",
+  "license" : "MIT",
+  "authors": [
+    {
+      "name": "IT-Blaster",
+      "email": "it-blaster@yandex.ru"
+    }
+  ],
+  "require": {
+    "symfony/symfony": ">=2.2",
+    "propel/propel-bundle": ">=1.4",
+  },
+  "autoload": {
+    "psr-0": { "ItBlaster\\MailTemplateBundle": "" }
+  },
+  "minimum-stability": "dev",
+  "target-dir": "ItBlaster/MailTemplateBundle"
+}
