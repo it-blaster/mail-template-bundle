@@ -18,6 +18,5 @@
   "autoload": {
     "psr-0": { "ItBlaster\\MailTemplateBundle": "" }
   },
-  "minimum-stability": "dev",
   "target-dir": "ItBlaster/MailTemplateBundle"
 }

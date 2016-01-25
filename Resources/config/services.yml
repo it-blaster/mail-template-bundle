@@ -1,0 +1,12 @@
+parameters:
+    itblaster_mail_template.class:    ItBlaster\MailTemplateBundle\Service\ItBlasterMailTemplate
+
+services:
+    itblaster_mail_template.admin.mail_template:
+        class: ItBlaster\MailTemplateBundle\Admin\MailTemplateAdmin
+        arguments: [~, ItBlaster\MailTemplateBundle\Model\MailTemplate, SonataAdminBundle:CRUD]
+        tags:
+            - {name: sonata.admin, manager_type: propel, group: Контент, label: Шаблоны писем }
+    itblaster_mail_template:
+        class:      %itblaster_mail_template.class%
+        arguments:  [@mailer, %mailer_user%, %mailer_user_title%, @templating, @request_stack, %locale%]

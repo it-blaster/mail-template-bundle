@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="default" namespace="ItBlaster\MailTemplateBundle\Model" defaultIdMethod="native">
+
+    <table name="mail_template">
+        <column name="id"               type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="alias"            type="varchar" size="255" required="true" />
+        <column name="title_template"   type="varchar" size="255" required="true" />
+        <column name="title"            type="varchar" size="1000" required="false" />
+        <column name="content"          type="longvarchar" required="false" />
+        <column name="variables"        type="longvarchar" required="false" />
+
+        <unique>
+            <unique-column name="alias" />
+        </unique>
+
+        <behavior name="timestampable" />
+    </table>
+
+</database>
