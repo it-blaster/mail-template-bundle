@@ -1,6 +1,7 @@
 <?php
 namespace ItBlaster\MailTemplateBundle\Command;
 
+use ItBlaster\MailTemplateBundle\Model\MailTemplate;
 use ItBlaster\MailTemplateBundle\Model\MailTemplateQuery;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -8,7 +9,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MailTemplateCommand extends Command
+/**
+ * Список заведённых шаблонов
+ *
+ * Class MailListCommand
+ * @package ItBlaster\MailTemplateBundle\Command
+ */
+class MailListCommand extends Command
 {
     /**
      * Вывод ссобщения в консоль
@@ -26,7 +33,7 @@ class MailTemplateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('itblaster:mail:template')
+            ->setName('itblaster:mail:list')
             ->setDescription('Mail template list')
 //            ->addArgument('alias',InputArgument::OPTIONAL,'Template description')
             ->addOption('alias',null,InputOption::VALUE_OPTIONAL,'Выводит информацию по шаблону')
@@ -49,15 +56,13 @@ EOF
         /** @var ConsoleOutput $output */
         $this->output = $output;
 
-        //информация по конкретному шаблону
-        if ($alias = $input->getOption('alias')) {
-            $template =  MailTemplateQuery::create()->findOneByAlias($alias);
-            if ($template) {
-                $output->writeln('<info>'.$template->getAlias().'</info>'.'     '.$template->getTitleTemplate().'
-<comment>Переменные</comment>:
-'.$template->getVariables());
-            } else {
-                $output->writeln('<error>Шаблон с алиасом <question>'.$alias.'</question> не найден</error>');
+        $template_list =  MailTemplateQuery::create()->find();
+        if (!count($template_list)) {
+            $this->log('нет ни одного шаблона');
+        } else {
+            foreach ($template_list as $template) {
+                /** @var MailTemplate $template */
+                $this->log('<info>'.$template->getAlias().':</info> <comment>'.$template->getTitle().'</comment>');
             }
         }
     }

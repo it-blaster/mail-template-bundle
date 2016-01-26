@@ -202,7 +202,6 @@ class ItBlasterMailTemplate
                 $message->attach(\Swift_Attachment::fromPath($attach));
             }
         }
-
         return $this->getMailer()->send($message);
     }
 
