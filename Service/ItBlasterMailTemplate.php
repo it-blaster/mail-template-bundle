@@ -42,16 +42,14 @@ class ItBlasterMailTemplate
      * @param $mailer_user_title    string
      * @param $templating           DelegatingEngine
      * @param $request_stack        RequestStack
-     * @param $default_locale       string
      */
-    public function __construct($mailer, $mailer_user, $mailer_user_title, $templating, $request_stack, $default_locale)
+    public function __construct($mailer, $mailer_user, $mailer_user_title, $templating, $request_stack)
     {
         $request                    = $request_stack->getCurrentRequest();
         $this->mailer               = $mailer;
         $this->mailer_user          = $mailer_user;
         $this->mailer_user_title    = $mailer_user_title;
         $this->templating           = $templating;
-        $this->locale               = $request ? $request->getLocale() : $default_locale;
     }
 
     /**
@@ -95,97 +93,11 @@ class ItBlasterMailTemplate
     }
 
     /**
-     * Текущий язык
-     *
-     * @return string (ru|en)
-     */
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    /**
      * @return array
      */
     public function getReplyTo()
     {
         return $this->reply_to;
-    }
-
-    /**
-     * Отправка письма
-     *
-     * @param string $alias_template Алиас шаблона
-     * @param array $emails_to Получаетели письма
-     * @param array $variables Переменные письма
-     * @param string $locale Язык (ru|en)
-     * @param array $attachments
-     * @param string $subject
-     * @return boolean
-     * @throws \Exception
-     */
-    public function sendTemplateMail(
-        $alias_template,
-        array $emails_to,
-        array $variables,
-        $locale = null,
-        $attachments = array(),
-        $subject = null
-    )
-    {
-        $mail_template = MailTemplateQuery::create()->findOneByAlias($alias_template);
-        if (!$mail_template) {
-            throw new \Exception('Template mail "'.$alias_template.'" not found'); //если не нашли шаблон, выкидываем исключение
-        }
-
-        $mail_template->setLocale($locale ? $locale : $this->getLocale());
-
-        //от
-        $from = $this->getMailerUser();
-        $from_title = $this->getMailerUserTitle();
-
-        //заголовок письма
-        if (is_null($subject)) {
-            $variables['content'] = addslashes($mail_template->getTitle());
-            $subject = $this->getTemplating()->render('ItBlasterMailTemplateBundle:Mail:template.html.php', $variables);
-        }
-
-        //текст письма
-        $variables['content'] = addslashes($mail_template->getContent());
-        $body = $this->getTemplating()->render('ItBlasterMailTemplateBundle:Mail:template.html.php', $variables);
-
-        foreach ($emails_to as $i => $email) {
-            $emails_to[$i] = trim($email);
-        }
-
-        $message = \Swift_Message::newInstance()
-            ->setSubject($subject)
-            ->setFrom(array(
-                $from => $from_title
-            ))
-            ->setTo($emails_to)
-            ->setBody($body)
-            ->setContentType("text/html");
-
-        if ($this->getReplyTo()) {
-            $message->setReplyTo($this->getReplyTo());
-        }
-
-        if (is_array($attachments)) {
-            foreach ($attachments as $attach ) {
-                $message->attach(\Swift_Attachment::fromPath($attach));
-            }
-        }
-
-        return $this->getMailer()->send($message);
-    }
-
-    /**
-     * @param mixed $locale
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
     }
 
     /**
@@ -228,5 +140,70 @@ class ItBlasterMailTemplate
         $this->reply_to = $reply_to;
     }
 
+
+    /**
+     * Отправка письма
+     *
+     * @param string $alias_template Алиас шаблона
+     * @param array $emails_to Получаетели письма
+     * @param array $variables Переменные письма
+     * @param string $locale Язык (ru|en)
+     * @param array $attachments
+     * @param string $subject
+     * @return boolean
+     * @throws \Exception
+     */
+    public function sendTemplateMail(
+        $alias_template,
+        array $emails_to,
+        array $variables,
+        $attachments = array(),
+        $subject = null
+    )
+    {
+        $mail_template = MailTemplateQuery::create()->findOneByAlias($alias_template);
+        if (!$mail_template) {
+            throw new \Exception('Template mail "'.$alias_template.'" not found'); //если не нашли шаблон, выкидываем исключение
+        }
+
+        //от
+        $from = $this->getMailerUser();
+        $from_title = $this->getMailerUserTitle();
+
+        //заголовок письма
+        if (is_null($subject)) {
+            $variables['content'] = addslashes($mail_template->getTitle());
+            $subject = $this->getTemplating()->render('ItBlasterMailTemplateBundle:Mail:template.html.php', $variables);
+        }
+
+        //текст письма
+        $variables['content'] = addslashes($mail_template->getContent());
+        $body = $this->getTemplating()->render('ItBlasterMailTemplateBundle:Mail:template.html.php', $variables);
+
+        foreach ($emails_to as $i => $email) {
+            $emails_to[$i] = trim($email);
+        }
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject($subject)
+            ->setFrom(array(
+                $from => $from_title
+            ))
+            ->setTo($emails_to)
+            ->setBody($body)
+            ->setContentType("text/html");
+
+        if ($this->getReplyTo()) {
+            $message->setReplyTo($this->getReplyTo());
+        }
+
+        if (is_array($attachments)) {
+            foreach ($attachments as $attach ) {
+                $message->attach(\Swift_Attachment::fromPath($attach));
+            }
+        }
+
+        return $this->getMailer()->send($message);
+    }
 
 }
